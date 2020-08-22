@@ -1,0 +1,14 @@
+.list {
+    width: 80%;
+    height: 400px;
+    background-color: #F7F7F8;
+    display: flex;
+    margin-left: 20%;
+    justify-content: center;
+}
+
+.tabela {
+    width: 80%;
+    margin: 20px;
+}
+
