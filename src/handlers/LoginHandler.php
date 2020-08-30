@@ -1,37 +1,38 @@
 <?php
+
 namespace src\handlers;
 
 use src\models\User;
 
-class LoginHandler {
+class LoginHandler
+{
 
-    public static function VerifyLogin($email, $senha) {
+    public static function VerifyLogin($email, $senha)
+    {
         $usuario = User::select()->where('email', $email)->one();
-        
+
         if ($usuario) {
             if (password_verify($senha, $usuario['senha'])) {
                 $token = md5(time() . rand(0, 9999) . time());
-                
+
                 User::update()->set('token', $token)->where('email', $email)->execute();
                 return $token;
             } else {
                 echo 'senha não confere';
             }
-        }else {
+        } else {
             echo "não";
         }
-        
     }
 
     public static function chekinLogin()
     {
-        
         if (!empty($_SESSION['token'])) {
             $token = $_SESSION['token'];
 
             $data = User::select()->where('token', $token)->one();
 
-            if (count($data) > 0) {
+            if ($data) {
                 $usuarioLogado = new User();
                 $usuarioLogado->nome = $data['nome'];
                 $usuarioLogado->email = $data['email'];
@@ -42,7 +43,6 @@ class LoginHandler {
 
                 return $usuarioLogado;
             }
-            
         }
         return false;
     }
@@ -65,5 +65,4 @@ class LoginHandler {
             'senha' => $senha
         ])->execute();
     }
-
 }

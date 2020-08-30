@@ -1,14 +1,30 @@
 .list {
-    width: 80%;
-    height: 400px;
-    background-color: #F7F7F8;
-    display: flex;
-    margin-left: 20%;
-    justify-content: center;
+    width: 78%;    
+    margin-left: 22%;
+    font-family: Roboto;
+    background-color: rgb(216, 216, 216);
 }
 
 .tabela {
-    width: 80%;
-    margin: 20px;
+    margin-bottom: 68px;
+    margin-top: 20px; 
+    width: 100%;  
+    border: 1px solid #9A9A9A;
+}
+
+.tabela tbody tr {
+    border-bottom: 1px solid #9A9A9A;
+}
+
+.tabela tbody tr:hover {
+    background-color: rgb(255, 255, 129);
+}
+
+table { 
+    border-collapse: collapse; 
+}
+
+#img_prod {
+    border-radius: 100%;
 }
 

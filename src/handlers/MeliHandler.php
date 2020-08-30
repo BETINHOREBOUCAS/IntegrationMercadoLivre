@@ -83,26 +83,90 @@ class MeliHandler
 
         $meli = new Meli($appId, $secretKey);
         $saldo = $meli->get($url, $params);
-        $info->saldoDisponivel = $saldo['body']->available_balance; 
+        $info->saldoDisponivel = $saldo['body']->available_balance;
         $info->saldoIndisponivel = $saldo['body']->unavailable_balance;
 
         $url = "orders/search";
-        $params = array('seller' => 43441356, 'access_token' => $_SESSION['access_token']);
+        $params = array('seller' => $id, 'access_token' => $_SESSION['access_token']);
         $venda = $meli->get($url, $params);
-
 
         $url = "questions/search";
         $perguntas = $meli->get($url, $params);
         $totPergunta = 0;
         foreach ($perguntas['body']->questions as $key => $value) {
-            
-            if ($value->status == 'unanswered') {
+
+            if ($value->status == 'UNANSWERED') {
                 ++$totPergunta;
             }
         }
-        
+
         $info->perguntas = $totPergunta;
-        
+
         return $info;
+    }
+
+    public static function getProduto($appId, $secretKey)
+    {
+        $id = MeliHandler::getData($appId, $secretKey);
+        $id = $id['body']->id;
+        $params = array('access_token' => $_SESSION['access_token']);
+        $url = "/users/$id/items/search";
+
+        $meli = new Meli($appId, $secretKey);
+        $itens = $meli->get($url, $params);
+        $itens = $itens['body']->results;
+
+        $idItens = implode(",", $itens);
+        $url = "items?ids=$idItens&";
+        $itensArray = $meli->get($url, $params);
+
+        if (!isset($itensArray['body']->error)) {
+            foreach ($itensArray['body'] as $anuncio) {
+
+                if ($anuncio->body->id && $anuncio->body->status == 'active') {
+                    $url = "/visits/items?ids=" . $anuncio->body->id;
+                    $mlb = $anuncio->body->id;
+                    $visita = $meli->get($url);
+                    
+                    $produtoAtivo[] = [
+                        "id" => $anuncio->body->id,
+                        "title" => $anuncio->body->title,
+                        "thumbnail" => $anuncio->body->thumbnail,
+                        "variations" => $anuncio->body->variations,
+                        "price" => $anuncio->body->price,
+                        "permalink" => $anuncio->body->permalink,
+                        "status" => $anuncio->body->status,
+                        "quantidade" => $anuncio->body->available_quantity,
+                        "inicio" => $anuncio->body->start_time,
+                        "visitas" => $visita['body']->$mlb
+                    ];
+                }
+
+                if ($anuncio->body->id && $anuncio->body->status != 'active') {
+                    $url = "/visits/items?ids=" . $anuncio->body->id;
+                    $mlb = $anuncio->body->id;
+                    $visita = $meli->get($url);
+
+                    $produtoInativo[] = [
+                        "id" => $anuncio->body->id,
+                        "title" => $anuncio->body->title,
+                        "thumbnail" => $anuncio->body->thumbnail,
+                        "price" => $anuncio->body->price,
+                        "permalink" => $anuncio->body->permalink,
+                        "status" => $anuncio->body->status,
+                        "quantidade" => $anuncio->body->available_quantity,
+                        "inicio" => $anuncio->body->start_time,
+                        "visitas" => $visita['body']->$mlb
+                    ];
+                }
+            }
+        } else {
+            $produtoInativo = "";
+            $produtoAtivo = "";
+        }
+
+        $produtos = array('produtosAtivos' => $produtoAtivo, 'produtosInativos' => $produtoInativo);
+
+        return $produtos;
     }
 }

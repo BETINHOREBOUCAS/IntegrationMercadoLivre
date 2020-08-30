@@ -19,7 +19,7 @@ class HomeController extends Controller {
     }
 
     public function index() {
-        $redirectURI = 'http://localhost/integration/public';
+        $redirectURI = 'http://localhost/integration/public/';
         $appId = $this->usuarioLogado->appId;
         $secretKey = $this->usuarioLogado->secretKey;
         $siteId = $this->usuarioLogado->siteId;  
